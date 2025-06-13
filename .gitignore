@@ -1,0 +1,12 @@
+# Python
+backend/.venv/
+backend/__pycache__/
+backend/*.py[cod]
+backend/*.sqlite3
+
+# Node / Next.js
+frontend/node_modules/
+frontend/.next/
+
+# Archivos de entorno
+*.env
