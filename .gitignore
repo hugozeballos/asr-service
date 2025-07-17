@@ -10,3 +10,4 @@ frontend/.next/
 
 # Archivos de entorno
 *.env
+**/__pycache__/
