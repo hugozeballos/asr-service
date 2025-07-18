@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'api',
+    'transcriber',
 ]
 
 MIDDLEWARE = [
@@ -134,4 +135,7 @@ REST_FRAMEWORK = {
         "rest_framework.renderers.JSONRenderer",
     ],
 }
+
+ASR_MODEL_URL = os.getenv("ASR_MODEL_URL", "http://localhost:8081/predict")
+
 
