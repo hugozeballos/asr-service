@@ -1,0 +1,17 @@
+# Ignorar el entorno virtual
+*.venv
+.venv/
+venv/
+env/
+
+# Ignorar metadatos de git o entornos locales
+.git
+.gitignore
+
+# Archivos de desarrollo que no vas a necesitar
+*.pyc
+__pycache__/
+
+# Si tienes node_modules u otros
+node_modules/
+dist/
