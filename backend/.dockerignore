@@ -3,7 +3,7 @@
 .venv/
 venv/
 env/
-
+**venv*/
 # Ignorar metadatos de git o entornos locales
 .git
 .gitignore

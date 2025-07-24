@@ -7,9 +7,9 @@ import soundfile as sf
 app = FastAPI()
 
 # Carga explícita del modelo y assets desde cache local
-model = Wav2Vec2ForCTC.from_pretrained("facebook/mms-300m", local_files_only=True, torch_dtype=torch.float16)
-tokenizer = AutoTokenizer.from_pretrained("facebook/mms-300m", local_files_only=True)
-feature_extractor = AutoFeatureExtractor.from_pretrained("facebook/mms-300m", local_files_only=True)
+model = Wav2Vec2ForCTC.from_pretrained("facebook/mms-1b-all", local_files_only=True, torch_dtype=torch.float16)
+tokenizer = AutoTokenizer.from_pretrained("facebook/mms-1b-all", local_files_only=True)
+feature_extractor = AutoFeatureExtractor.from_pretrained("facebook/mms-1b-all", local_files_only=True)
 
 # Carga del modelo (una vez)
 pipe = pipeline("automatic-speech-recognition", model=model, tokenizer=tokenizer, feature_extractor=feature_extractor, framework="pt")

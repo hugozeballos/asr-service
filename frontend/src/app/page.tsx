@@ -20,10 +20,10 @@ export default function Home() {
     setLoading(true);
     try {
       const form = new FormData();
-      form.append("audio", file);
+      form.append("file", file);
 
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/transcribe/`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/transcribe/`,
         {
           method: "POST",
           body: form,

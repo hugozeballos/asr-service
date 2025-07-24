@@ -1,0 +1,12 @@
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - build
+      - '-t'
+      - 'us-central1-docker.pkg.dev/asr-service-poc/asr-repo/asr-frontend-service'
+      - '--build-arg'
+      - 'NEXT_PUBLIC_API_BASE_URL=https://asr-backend-service-463239650270.us-central1.run.app'
+      - '.'
+
+images:
+  - 'us-central1-docker.pkg.dev/asr-service-poc/asr-repo/asr-frontend-service'
