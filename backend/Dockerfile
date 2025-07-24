@@ -1,5 +1,6 @@
 # 1. Imagen base Python ligera
 FROM python:3.11-slim
+
 RUN pip install --upgrade pip
 
 # 2. Dependencias del SO (para soundfile, librosa…)
@@ -24,6 +25,6 @@ ENV PYTHONUNBUFFERED=1 \
 
 # 6. Puerto en el que escucha Cloud Run
 EXPOSE 8080
-
+ENV PYTHONPATH=/app/backend
 # 7. Arranque con Gunicorn (ASGI en producción)
-CMD ["gunicorn", "core.wsgi:application", "--bind", "0.0.0.0:8080"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8080", "--timeout", "900", "core.wsgi:application"] 

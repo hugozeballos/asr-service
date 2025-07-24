@@ -1,5 +1,5 @@
 # Python
-backend/.venv/
+.venv/
 backend/__pycache__/
 backend/*.py[cod]
 backend/*.sqlite3
@@ -11,3 +11,32 @@ frontend/.next/
 # Archivos de entorno
 *.env
 **/__pycache__/
+
+
+# Node
+node_modules/
+.npm/
+npm-debug.log*
+
+# Next.js
+.next/
+out/
+
+# Builds
+dist/
+build/
+
+# Sistemas
+.DS_Store
+Thumbs.db
+
+# Entorno local
+.env*
+*.log
+
+# Audios o datos grandes
+*.wav
+*.mp3
+*.jsonl
+
+*.zip

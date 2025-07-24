@@ -1,5 +1,22 @@
-gcloud builds submit --tag us-central1-docker.pkg.dev/asr-service-poc/asr-repo/asr-model-service ./asr-model-service         contruir el contenedor en gcp
+gcloud builds submit --tag us-central1-docker.pkg.dev/asr-service-poc/asr-repo/asr-model-service ./asr-model-service         contruir el contenedor en gcp modelo
 gcloud run deploy asr-model-service --image=us-central1-docker.pkg.dev/asr-service-poc/asr-repo/asr-model-service --region=us-central1 --platform=managed --allow-unauthenticated --memory=8Gi --cpu=2 --timeout=300        desplegar el servicio del modelo
+
+
+gcloud builds submit --tag us-central1-docker.pkg.dev/asr-service-poc/asr-repo/asr-backend-service       contruir el  backend
+gcloud run deploy asr-backend-service --image=us-central1-docker.pkg.dev/asr-service-poc/asr-repo/asr-backend-service --region=us-central1 --platform=managed --allow-unauthenticated --set-env-vars ASR_MODEL_URL=https://asr-model-service-463239650270.us-central1.run.app/predict --timeout=900        Desplegar el backend
+
+gcloud builds submit --config cloudbuild.yaml        para contruir el frontend
+gcloud run deploy asr-frontend-service --image us-central1-docker.pkg.dev/asr-service-poc/asr-repo/asr-frontend-service --platform managed --region us-central1 --allow-unauthenticated --port 8080        Desplegar el backend
+
+
+
+gcloud run services describe asr-backend-service --platform managed --region us-central1 --format="value(spec.template.spec.containers[0].env)"   SABER LA URL A LA QUE APUNTA
+
+gcloud logging read "resource.type=cloud_run_revision AND resource.labels.service_name=asr-backend-service" --limit=20 --format="value(textPayload)"  Ver losg del backend
+
 
 https://asr-model-service-463239650270.us-central1.run.app    url del modelo
 
+https://asr-backend-service-463239650270.us-central1.run.app   url del backend
+
+.\.venv\Scripts\activate  ACtivar el entorno
