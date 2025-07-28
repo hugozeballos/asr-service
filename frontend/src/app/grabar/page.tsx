@@ -14,6 +14,10 @@ export default function GrabarPage() {
 
   const startRecording = async () => {
     recordedChunksRef.current = []; // ← limpia los chunks antes de grabar
+    setTranscript("");
+    setAudioURL(null);
+    setFile(null);
+
     try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         const recorder = new MediaRecorder(stream);
@@ -26,15 +30,20 @@ export default function GrabarPage() {
         };
 
         recorder.onstop = () => {
-        const blob = new Blob(recordedChunksRef.current, { type: "audio/webm" });
-        const f = new File([blob], "grabacion.webm", { type: "audio/webm" });
-        setFile(f);
-        setAudioURL(URL.createObjectURL(blob));
-        setIsRecording(false);
+          const blob = new Blob(recordedChunksRef.current, { type: "audio/webm" });
+          const f = new File([blob], "grabacion.webm", { type: "audio/webm" });
+          setFile(f);
+          setAudioURL(URL.createObjectURL(blob));
+          setIsRecording(false);
+          // ✅ Libera el micrófono
+          stream.getTracks().forEach((track) => track.stop());
+          // 🧪 Consola para debug
+          console.log("🎧 Grabación completa:", f.name, f.type, f.size);
         };
 
         recorder.start();
         setIsRecording(true);
+
     } catch (err) {
         console.error("Error al acceder al micrófono", err);
     }
@@ -110,6 +119,11 @@ export default function GrabarPage() {
             >
               ⏹ Detener
             </button>
+          )}
+          {!file && !isRecording && (
+            <p className="text-sm text-gray-500 italic">
+              Sube un archivo o graba tu voz para comenzar.
+            </p>
           )}
         </div>
 
