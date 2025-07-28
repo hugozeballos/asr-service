@@ -11,6 +11,7 @@ class TranscribeAPIView(APIView):
     parser_classes = [MultiPartParser]
 
     def post(self, request, *args, **kwargs):
+        
         audio_file = request.FILES.get("file")
         if not audio_file:
             return Response({"error": "Se requiere un archivo 'audio'"}, status=status.HTTP_400_BAD_REQUEST)

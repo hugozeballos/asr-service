@@ -3,13 +3,16 @@ from transformers import Wav2Vec2ForCTC, AutoTokenizer, AutoFeatureExtractor, pi
 import torch
 import io
 import soundfile as sf
+from pydub import AudioSegment
+import magic
+import mimetypes
 
 app = FastAPI()
 
 # Carga explícita del modelo y assets desde cache local
-model = Wav2Vec2ForCTC.from_pretrained("facebook/mms-300m", local_files_only=True, torch_dtype=torch.float16)
-tokenizer = AutoTokenizer.from_pretrained("facebook/mms-300m", local_files_only=True)
-feature_extractor = AutoFeatureExtractor.from_pretrained("facebook/mms-300m", local_files_only=True)
+model = Wav2Vec2ForCTC.from_pretrained("facebook/mms-1b-all", local_files_only=True, torch_dtype=torch.float16)
+tokenizer = AutoTokenizer.from_pretrained("facebook/mms-1b-all", local_files_only=True)
+feature_extractor = AutoFeatureExtractor.from_pretrained('facebook/mms-1b-all', local_files_only=True)
 
 # Carga del modelo (una vez)
 pipe = pipeline("automatic-speech-recognition", model=model, tokenizer=tokenizer, feature_extractor=feature_extractor, framework="pt")
@@ -17,8 +20,32 @@ pipe = pipeline("automatic-speech-recognition", model=model, tokenizer=tokenizer
 @app.post("/predict")
 async def predict(file: UploadFile = File(...)):
     audio_bytes = await file.read()
-    # Decode audio file from bytes (e.g. .wav or .flac)
-    audio_input, sample_rate = sf.read(io.BytesIO(audio_bytes))
+
+    # Detectar tipo MIME
+    mime = magic.Magic(mime=True)
+    with open("temp_input", "wb") as temp_file:
+        temp_file.write(audio_bytes)
+    mime_type = mime.from_file("temp_input")
+
+    # Convertir si es necesario
+    wav_io = io.BytesIO()
+    if "webm" in mime_type:
+        print("🔄 Convirtiendo de WEBM a WAV...")
+        audio = AudioSegment.from_file(io.BytesIO(audio_bytes), format="webm")
+        audio.export(wav_io, format="wav")
+        wav_io.seek(0)
+    elif "mp3" in mime_type:
+        print("🔄 Convirtiendo de MP3 a WAV...")
+        audio = AudioSegment.from_file(io.BytesIO(audio_bytes), format="mp3")
+        audio.export(wav_io, format="wav")
+        wav_io.seek(0)
+    else:
+        print("✅ Formato compatible o desconocido, usando directamente")
+        wav_io = io.BytesIO(audio_bytes)
+
+    # Leer audio y hacer inferencia
+    audio_input, sample_rate = sf.read(wav_io)
+
     result = pipe({
         "array": audio_input,
         "sampling_rate": sample_rate
