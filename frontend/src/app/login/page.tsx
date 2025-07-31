@@ -12,7 +12,7 @@ export default function LoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/token/`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/token/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

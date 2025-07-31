@@ -6,9 +6,9 @@ gcloud builds submit --tag us-central1-docker.pkg.dev/asr-service-poc/asr-repo/a
 gcloud run deploy asr-backend-service --image=us-central1-docker.pkg.dev/asr-service-poc/asr-repo/asr-backend-service --region=us-central1 --platform=managed --allow-unauthenticated --set-env-vars ASR_MODEL_URL=https://asr-model-service-463239650270.us-central1.run.app/predict --timeout=900        Desplegar el backend
 
 gcloud builds submit --config cloudbuild.yaml        para contruir el frontend
-gcloud run deploy asr-frontend-service --image us-central1-docker.pkg.dev/asr-service-poc/asr-repo/asr-frontend-service --platform managed --region us-central1 --allow-unauthenticated --port 8080        Desplegar el backend
+gcloud run deploy asr-frontend-service --image us-central1-docker.pkg.dev/asr-service-poc/asr-repo/asr-frontend-service --platform managed --region us-central1 --allow-unauthenticated --port 8080        Desplegar el front
 
-
+gcloud run services update asr-backend-service --update-env-vars ASR_MODEL_URL=https://asr-model-service-463239650270.us-central1.run.app/predict --region=us-central1      agregar variables de entorno
 
 gcloud run services describe asr-backend-service --platform managed --region us-central1 --format="value(spec.template.spec.containers[0].env)"   SABER LA URL A LA QUE APUNTA
 
