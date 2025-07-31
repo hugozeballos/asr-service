@@ -20,3 +20,19 @@ https://asr-model-service-463239650270.us-central1.run.app    url del modelo
 https://asr-backend-service-463239650270.us-central1.run.app   url del backend
 
 .\.venv\Scripts\activate  ACtivar el entorno
+
+Contraseña base de datos postres en gcp: postgres
+usuario base de datos postgress en cloud:
+usuario:asr_user(admin)
+password:admin
+
+superusuario base de datos postgress en cloud :
+usuario:hugo
+password:admin
+
+
+para conectarse a la base de postgres de cloud:
+
+psql -h 34.42.172.179 -U asr_user -d asr_db -p 5432
+
+
