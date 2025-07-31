@@ -6,6 +6,26 @@ steps:
       - 'us-central1-docker.pkg.dev/asr-service-poc/asr-repo/asr-frontend-service'
       - '--build-arg'
       - 'NEXT_PUBLIC_API_BASE_URL=https://asr-backend-service-463239650270.us-central1.run.app'
+      - '--build-arg'
+      - 'DB_NAME=asr_db'
+      - '--build-arg'
+      - 'DB_USER=postgres'
+      - '--build-arg'
+      - 'DB_PASSWORD=admin'
+      - '.'
+
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - build
+      - '-t'
+      - 'us-central1-docker.pkg.dev/asr-service-poc/asr-repo/asr-backend-service'
+      - '--build-arg'
+      - 'DB_NAME=postgres'
+      - '--build-arg'
+      - 'DB_USER=postgres'
+      - '--build-arg'
+      - 'DB_PASSWORD=la_clave_correcta_aqui'
       - '.'
 
 images:
