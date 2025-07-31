@@ -67,11 +67,15 @@ export default function GrabarPage() {
     try {
       const form = new FormData();
       form.append("file", file);
-
+      const token = localStorage.getItem('access')
+      
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/transcribe/`,
         {
           method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
           body: form,
         }
       );
