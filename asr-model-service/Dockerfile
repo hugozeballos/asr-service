@@ -1,4 +1,4 @@
-FROM python:3.10-slim
+FROM nvidia/cuda:12.2.0-cudnn8-runtime-ubuntu22.04
 
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
