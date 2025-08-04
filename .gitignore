@@ -38,5 +38,7 @@ Thumbs.db
 *.wav
 *.mp3
 *.jsonl
+# Evita subir credenciales
+*.json
 
 *.zip

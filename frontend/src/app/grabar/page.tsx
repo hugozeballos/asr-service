@@ -6,6 +6,7 @@ export default function GrabarPage() {
   const [file, setFile] = useState<File | null>(null);
   const [audioURL, setAudioURL] = useState<string | null>(null);
   const [transcript, setTranscript] = useState<string>("");
+  const [originalTranscript, setOriginalTranscript] = useState<string>("");
   const [isRecording, setIsRecording] = useState<boolean>(false);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const recordedChunksRef = useRef<Blob[]>([]);
@@ -15,6 +16,7 @@ export default function GrabarPage() {
   const startRecording = async () => {
     recordedChunksRef.current = []; // ← limpia los chunks antes de grabar
     setTranscript("");
+    setOriginalTranscript("");
     setAudioURL(null);
     setFile(null);
 
@@ -89,6 +91,39 @@ export default function GrabarPage() {
     } finally {
       setLoading(false);
       setIsConfirmed(null);
+    }
+  };
+
+  const onSaveCorrection = async () => {
+    if (!file || !originalTranscript || !transcript) {
+      alert("Faltan datos para guardar.");
+      return;
+    }
+
+    const form = new FormData();
+    form.append("file", file);
+    form.append("original_text", originalTranscript);
+    form.append("corrected_text", transcript);
+
+    const token = localStorage.getItem("access");
+
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/upload-audio/`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: form,
+      });
+
+      if (res.ok) {
+        alert("✅ Datos guardados exitosamente.");
+      } else {
+        alert("❌ Error al guardar los datos.");
+      }
+    } catch (error) {
+      console.error(error);
+      alert("❌ Error al guardar los datos.");
     }
   };
 
@@ -189,7 +224,7 @@ export default function GrabarPage() {
               )}
 
               {isConfirmed === false && (
-                <button className="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
+                <button onClick={onSaveCorrection} className="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
                   💾 Guardar corrección
                 </button>
               )}

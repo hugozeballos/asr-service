@@ -1,11 +1,35 @@
 import os
 import requests
 from rest_framework.views import APIView
-from rest_framework.parsers import MultiPartParser
+from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from rest_framework import status
 from django.conf import settings
 from rest_framework.permissions import IsAuthenticated
+from .gcp_clients import upload_audio_to_gcs, save_metadata_to_firestore
+
+class AudioUploadView(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]
+
+    def post(self, request, *args, **kwargs):
+        file = request.FILES.get('audio')
+        transcription = request.data.get('transcription')
+        corrected = request.data.get('corrected_transcription', None)
+
+        if not file or not transcription:
+            return Response({'error': 'Missing audio file or transcription'}, status=400)
+
+        filename = file.name
+        user_id = request.user.id
+
+        try:
+            audio_url = upload_audio_to_gcs(file, filename)
+            save_metadata_to_firestore(user_id, filename, transcription, corrected)
+        except Exception as e:
+            return Response({'error': str(e)}, status=500)
+
+        return Response({'message': 'Upload successful', 'file_url': audio_url})
 
 
 

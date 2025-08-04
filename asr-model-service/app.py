@@ -15,7 +15,7 @@ tokenizer = AutoTokenizer.from_pretrained("facebook/mms-1b-all", local_files_onl
 feature_extractor = AutoFeatureExtractor.from_pretrained('facebook/mms-1b-all', local_files_only=True)
 
 # Carga del modelo (una vez)
-pipe = pipeline("automatic-speech-recognition", model=model, tokenizer=tokenizer, feature_extractor=feature_extractor, framework="pt")
+pipe = pipeline("automatic-speech-recognition", model=model, tokenizer=tokenizer, feature_extractor=feature_extractor, framework="pt", device=0)
 
 @app.post("/predict")
 async def predict(file: UploadFile = File(...)):
