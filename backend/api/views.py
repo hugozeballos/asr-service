@@ -20,12 +20,20 @@ class AudioUploadView(APIView):
         if not file or not transcription:
             return Response({'error': 'Missing audio file or transcription'}, status=400)
 
-        filename = file.name
+        import uuid, os
+        ext = os.path.splitext(file.name)[1] or ".webm"  # por si viene sin extensión
+        filename = f"audio_{uuid.uuid4().hex}{ext}"
         user_id = request.user.id
 
         try:
             audio_url = upload_audio_to_gcs(file, filename)
-            save_metadata_to_firestore(user_id, filename, transcription, corrected)
+            data = {
+                "user_id": user_id,
+                "filename": filename,
+                "transcription": transcription,
+                "corrected": corrected,
+            }
+            save_metadata_to_firestore(data)
         except Exception as e:
             return Response({'error': str(e)}, status=500)
 

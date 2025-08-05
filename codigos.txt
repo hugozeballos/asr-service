@@ -1,5 +1,5 @@
 gcloud builds submit --tag us-central1-docker.pkg.dev/asr-service-poc/asr-repo/asr-model-service ./asr-model-service         contruir el contenedor en gcp modelo
-gcloud run deploy asr-model-service --image=us-central1-docker.pkg.dev/asr-service-poc/asr-repo/asr-model-service --region=us-central1 --platform=managed --allow-unauthenticated --memory=8Gi --cpu=2 --timeout=300        desplegar el servicio del modelo
+gcloud run deploy asr-model-service --image=us-central1-docker.pkg.dev/asr-service-poc/asr-repo/asr-model-service --region=us-central1 --platform=managed --allow-unauthenticated --memory=8Gi --cpu=2 --timeout=300 --gpu --accelerator="type=nvidia-tesla-t4,count=1"       desplegar el servicio del modelo
 
 
 gcloud builds submit --tag us-central1-docker.pkg.dev/asr-service-poc/asr-repo/asr-backend-service       contruir el  backend

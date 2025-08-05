@@ -1,0 +1,21 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: asr-model-service
+spec:
+  template:
+    metadata:
+      annotations:
+        run.googleapis.com/launch-stage: BETA
+        run.googleapis.com/accelerator: "nvidia-l4"
+        run.googleapis.com/gpu-zonal-redundancy-disabled: "true"
+    spec:
+      containers:
+        - image: us-central1-docker.pkg.dev/asr-service-poc/asr-repo/asr-model-service
+          resources:
+            limits:
+              memory: "16Gi"
+              cpu: "4"
+              nvidia.com/gpu: "1"
+          ports:
+            - containerPort: 8080
