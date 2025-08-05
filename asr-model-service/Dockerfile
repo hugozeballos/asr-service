@@ -1,4 +1,4 @@
-FROM nvidia/cuda:12.2.0-cudnn8-runtime-ubuntu22.04
+FROM nvidia/cuda:12.1.1-cudnn8-runtime-ubuntu22.04
 
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
@@ -7,7 +7,8 @@ ENV HF_HUB_DISABLE_SYMLINKS_WARNING=1
 ENV TRANSFORMERS_CACHE=/app/cache
 
 WORKDIR /app
-
+# Instala Python 3 y pip
+RUN apt-get update && apt-get install -y python3 python3-pip
 # Instala dependencias del sistema
 RUN apt-get update && apt-get install -y libsndfile1 ffmpeg libmagic1 sox libsox-dev && rm -rf /var/lib/apt/lists/*
 
@@ -17,7 +18,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Crea carpeta y descarga modelo/tokenizer/extractor localmente
 
-RUN python -c "from transformers import Wav2Vec2ForCTC, AutoTokenizer, AutoFeatureExtractor; Wav2Vec2ForCTC.from_pretrained('facebook/mms-1b-all'); AutoTokenizer.from_pretrained('facebook/mms-1b-all'); AutoFeatureExtractor.from_pretrained('facebook/mms-1b-all')"
+RUN python3 -c "from transformers import Wav2Vec2ForCTC, AutoTokenizer, AutoFeatureExtractor; Wav2Vec2ForCTC.from_pretrained('facebook/mms-1b-all'); AutoTokenizer.from_pretrained('facebook/mms-1b-all'); AutoFeatureExtractor.from_pretrained('facebook/mms-1b-all')"
 
 
 

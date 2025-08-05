@@ -66,6 +66,7 @@ export default function GrabarPage() {
     if (!file) return;
     setLoading(true);
     setTranscript("");
+    
     try {
       const form = new FormData();
       form.append("file", file);
@@ -85,6 +86,7 @@ export default function GrabarPage() {
       if (!res.ok) throw new Error(`Error ${res.status}`);
       const json = await res.json();
       setTranscript(json.text ?? "");
+      setOriginalTranscript(json.text ?? ""); 
     } catch (err) {
       console.error(err);
       setTranscript("❌ Error al transcribir");
@@ -101,9 +103,9 @@ export default function GrabarPage() {
     }
 
     const form = new FormData();
-    form.append("file", file);
-    form.append("original_text", originalTranscript);
-    form.append("corrected_text", transcript);
+    form.append("audio", file);
+    form.append("transcription", originalTranscript);
+    form.append("corrected_transcription", transcript);
 
     const token = localStorage.getItem("access");
 

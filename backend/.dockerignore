@@ -15,3 +15,4 @@ __pycache__/
 # Si tienes node_modules u otros
 node_modules/
 dist/
+backend/credentials/asr-service-poc-3009543e95ac.json
