@@ -20,9 +20,7 @@ class AudioUploadView(APIView):
         if not file or not transcription:
             return Response({'error': 'Missing audio file or transcription'}, status=400)
 
-        import uuid, os
-        ext = os.path.splitext(file.name)[1] or ".webm"  # por si viene sin extensión
-        filename = f"audio_{uuid.uuid4().hex}{ext}"
+        filename = file.name
         user_id = request.user.id
 
         try:
