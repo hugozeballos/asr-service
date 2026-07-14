@@ -32,6 +32,8 @@ Thumbs.db
 
 # Entorno local
 .env*
+!.env.example
+!*/.env.example
 *.log
 
 # Audios o datos grandes
