@@ -21,18 +21,16 @@ https://asr-backend-service-463239650270.us-central1.run.app   url del backend
 
 .\.venv\Scripts\activate  ACtivar el entorno
 
-Contraseña base de datos postres en gcp: REDACTED
-usuario base de datos postgress en cloud:
-usuario:asr_user(admin)
-password: REDACTED
+Contraseña base de datos postgres en gcp: DB_PASSWORD=<insert-your-db-password>
+usuario base de datos postgres en cloud:
+usuario: DB_USER=<insert-your-db-user>
+password: DB_PASSWORD=<insert-your-db-password>
 
-superusuario base de datos postgress en cloud :
-usuario:hugo
-password: REDACTED
+superusuario base de datos postgres en cloud:
+usuario: DJANGO_SUPERUSER=<insert-your-superuser-name>
+password: DJANGO_SUPERUSER_PASSWORD=<insert-your-superuser-password>
 
 
 para conectarse a la base de postgres de cloud:
 
-psql -h REDACTED_DB_HOST -U asr_user -d asr_db -p 5432
-
-
+psql -h DB_HOST=<insert-your-db-host> -U DB_USER=<insert-your-db-user> -d DB_NAME=<insert-your-db-name> -p 5432

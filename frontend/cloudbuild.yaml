@@ -1,3 +1,8 @@
+# DB_NAME/DB_USER/DB_PASSWORD are Cloud Build substitution variables.
+# Supply them at build time, e.g.:
+#   gcloud builds submit --config cloudbuild.yaml \
+#     --substitutions=_DB_NAME=<insert-your-db-name>,_DB_USER=<insert-your-db-user>,_DB_PASSWORD=<insert-your-db-password>
+# or configure them as trigger substitutions / pull from Secret Manager in the Cloud Build trigger.
 steps:
   - name: 'gcr.io/cloud-builders/docker'
     args:
@@ -7,11 +12,11 @@ steps:
       - '--build-arg'
       - 'NEXT_PUBLIC_API_BASE_URL=https://asr-backend-service-463239650270.us-central1.run.app'
       - '--build-arg'
-      - 'DB_NAME=asr_db'
+      - 'DB_NAME=${_DB_NAME}'
       - '--build-arg'
-      - 'DB_USER=REDACTED'
+      - 'DB_USER=${_DB_USER}'
       - '--build-arg'
-      - 'DB_PASSWORD=REDACTED'
+      - 'DB_PASSWORD=${_DB_PASSWORD}'
       - '.'
 
 steps:
@@ -21,11 +26,11 @@ steps:
       - '-t'
       - 'us-central1-docker.pkg.dev/asr-service-poc/asr-repo/asr-backend-service'
       - '--build-arg'
-      - 'DB_NAME=postgres'
+      - 'DB_NAME=${_DB_NAME}'
       - '--build-arg'
-      - 'DB_USER=REDACTED'
+      - 'DB_USER=${_DB_USER}'
       - '--build-arg'
-      - 'DB_PASSWORD=REDACTED_DB_PASSWORD'
+      - 'DB_PASSWORD=${_DB_PASSWORD}'
       - '.'
 
 images:
