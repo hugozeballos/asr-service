@@ -1,8 +1,13 @@
 "use client";
 
 import { useState, useRef } from "react";
+import useAuthGuard from '@/hooks/useAuthGuard'
+import Navbar from '@/components/Navbar'
 
-export default function GrabarPage() {
+
+
+export default function GrabarPage() {  
+  const isReady = useAuthGuard()
   const [file, setFile] = useState<File | null>(null);
   const [audioURL, setAudioURL] = useState<string | null>(null);
   const [transcript, setTranscript] = useState<string>("");
@@ -12,6 +17,8 @@ export default function GrabarPage() {
   const recordedChunksRef = useRef<Blob[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [isConfirmed, setIsConfirmed] = useState<boolean | null>(null);
+  
+  if (!isReady) return null
 
   const startRecording = async () => {
     recordedChunksRef.current = []; // ← limpia los chunks antes de grabar
@@ -131,6 +138,7 @@ export default function GrabarPage() {
 
   return (
     <main className="min-h-screen bg-white text-gray-800 font-sans py-10 px-4 max-w-xl mx-auto">
+      <Navbar />
       <h1 className="text-3xl font-bold text-blue-600 text-center mb-8">Transcriptor ASR</h1>
 
       <div className="space-y-6 bg-gray-50 border border-gray-200 p-6 rounded-lg shadow">
@@ -211,10 +219,13 @@ export default function GrabarPage() {
               {isConfirmed === null && (
                 <>
                   <button
-                    onClick={() => setIsConfirmed(true)}
+                    onClick={() => {
+                      setIsConfirmed(true);
+                      onSaveCorrection(); // 👈 guarda de inmediato
+                    }}
                     className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
                   >
-                    ✅ Confirmar
+                    ✅ Guardar
                   </button>
                   <button
                     onClick={() => setIsConfirmed(false)}

@@ -7,6 +7,65 @@ from rest_framework import status
 from django.conf import settings
 from rest_framework.permissions import IsAuthenticated
 from .gcp_clients import upload_audio_to_gcs, save_metadata_to_firestore
+from google.cloud import firestore
+
+from rest_framework import viewsets, permissions
+from rest_framework.serializers import ModelSerializer
+from django.contrib.auth.models import User
+from rest_framework import serializers
+
+# Serializador
+class UserSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True, required=True)
+
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email', 'is_staff', 'is_active', 'password']
+        extra_kwargs = {
+            'is_staff': {'required': True},
+            'is_active': {'required': True},
+        }
+
+    def create(self, validated_data):
+        user = User.objects.create_user(
+            username=validated_data['username'],
+            email=validated_data.get('email', ''),
+            password=validated_data['password'],
+            is_staff=validated_data.get('is_staff', False),
+            is_active=validated_data.get('is_active', True)
+        )
+        return user
+
+# Permiso personalizado (solo admin)
+class IsAdmin(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return request.user and request.user.is_staff
+
+# Vista
+class UserAdminViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [permissions.IsAuthenticated, IsAdmin]
+
+class ListTranscriptionsView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        db = firestore.Client()
+        collection_ref = db.collection("audios")
+        docs = collection_ref.stream()
+
+        user_id = str(request.user.id)
+        print("👤 Solicitando transcripciones para user_id:", user_id)
+
+        result = []
+        for doc in docs:
+            data = doc.to_dict()
+            print("📄 Documento Firestore:", data)  # 👈 agrega esto
+            data["id"] = doc.id
+            result.append(data)
+        print("📦 Total filtrado:", len(result))
+        return Response(result)
 
 class AudioUploadView(APIView):
     permission_classes = [IsAuthenticated]
@@ -20,14 +79,17 @@ class AudioUploadView(APIView):
         if not file or not transcription:
             return Response({'error': 'Missing audio file or transcription'}, status=400)
 
-        filename = file.name
-        user_id = request.user.id
+        import uuid, os
+        ext = os.path.splitext(file.name)[1] or ".webm"  # por si viene sin extensión
+        filename = f"audio_{uuid.uuid4().hex}{ext}"
+        user_id = str(request.user.id)
 
         try:
             audio_url = upload_audio_to_gcs(file, filename)
             data = {
                 "user_id": user_id,
                 "filename": filename,
+                "audio_url": audio_url,
                 "transcription": transcription,
                 "corrected": corrected,
             }

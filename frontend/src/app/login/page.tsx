@@ -24,7 +24,11 @@ export default function LoginPage() {
       const data = await res.json()
       localStorage.setItem('access', data.access)
       localStorage.setItem('refresh', data.refresh)
-      router.push('/grabar') // Redirigir a la página principal o protegida
+      console.log("TOKEN GUARDADO:", data.access) // 👈 esto
+      setTimeout(() => {
+        router.push('/grabar')
+        console.log("👀 TOKEN EN GRABAR:", localStorage.getItem("access"))
+      }, 200)  // Redirigir a la página principal o protegida
     } else {
       setError('Usuario o contraseña incorrectos.')
     }

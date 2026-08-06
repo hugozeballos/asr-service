@@ -153,5 +153,13 @@ ASR_MODEL_URL = os.getenv("ASR_MODEL_URL", "http://localhost:8081/predict")
 print("🔍 ASR_MODEL_URL en tiempo de ejecución:", ASR_MODEL_URL)
 
 
+from datetime import timedelta
 
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(hours=2),  # ⏰ Ahora dura 2 horas
+    #"REFRESH_TOKEN_LIFETIME": timedelta(days=7),  # Puedes mantenerlo o ajustarlo
+    #"ROTATE_REFRESH_TOKENS": False,
+    #"BLACKLIST_AFTER_ROTATION": False,
+    #"AUTH_HEADER_TYPES": ("Bearer",),
+}
 
