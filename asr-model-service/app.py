@@ -19,31 +19,33 @@ pipe = pipeline("automatic-speech-recognition", model=model, tokenizer=tokenizer
 
 @app.post("/predict")
 async def predict(file: UploadFile = File(...)):
+    """Transcribes an uploaded audio file with facebook/mms-1b-all.
+
+    Detects the upload's real MIME type (browsers often send WebM/MP3 for
+    recorded audio) and transcodes to WAV via pydub before inference; any
+    other format is passed through to soundfile as-is.
+    """
     audio_bytes = await file.read()
 
-    # Detectar tipo MIME
+    # Written to a fixed filename because python-magic needs a path, not
+    # bytes; not safe under concurrent requests (last writer wins).
     mime = magic.Magic(mime=True)
     with open("temp_input", "wb") as temp_file:
         temp_file.write(audio_bytes)
     mime_type = mime.from_file("temp_input")
 
-    # Convertir si es necesario
     wav_io = io.BytesIO()
     if "webm" in mime_type:
-        print("🔄 Convirtiendo de WEBM a WAV...")
         audio = AudioSegment.from_file(io.BytesIO(audio_bytes), format="webm")
         audio.export(wav_io, format="wav")
         wav_io.seek(0)
     elif "mp3" in mime_type:
-        print("🔄 Convirtiendo de MP3 a WAV...")
         audio = AudioSegment.from_file(io.BytesIO(audio_bytes), format="mp3")
         audio.export(wav_io, format="wav")
         wav_io.seek(0)
     else:
-        print("✅ Formato compatible o desconocido, usando directamente")
         wav_io = io.BytesIO(audio_bytes)
 
-    # Leer audio y hacer inferencia
     audio_input, sample_rate = sf.read(wav_io)
 
     result = pipe({
