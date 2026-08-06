@@ -3,6 +3,8 @@
 A proof-of-concept automatic speech recognition (ASR) system composed of three services: a **Next.js** frontend for recording/uploading audio, a **Django REST Framework** backend that handles auth and orchestration, and a **FastAPI** microservice that runs a Hugging Face speech-to-text model. A user records or uploads an audio clip, the audio is transcribed to text, and the transcription can be reviewed, corrected, and saved back to cloud storage for later use (e.g. dataset building or fine-tuning).
 
 > **Project context:** this repository was built during a contract at [CENIA](https://cenia.cl) (Centro Nacional de Inteligencia Artificial, Chile's national AI research center) as part of a larger effort to build an AI-powered Rapa Nui language translator. The code itself is a general-purpose ASR pipeline; no Rapa Nui-specific language configuration, dataset, or model adapter is currently present in this repo (see "Open questions" below).
+>
+> It's a sibling repo to [`translator-debug`](https://github.com/hugozeballos/translator-debug), the main translator application. That app's own `/api/asr/transcribe/` endpoint currently returns a mocked transcript (`provider: "mock"`); `asr-service` is the standalone, real speech-to-text implementation intended to back it.
 
 ## Tech Stack
 
@@ -93,5 +95,5 @@ Each service also has a Dockerfile for containerized builds (`docker build` from
 ## Open questions / not confirmed in code
 
 - **Language target**: `facebook/mms-1b-all` supports 1000+ languages via per-language adapters, but the code does not call `load_adapter()` or set a target language anywhere — it loads the base checkpoint as-is. No reference to Rapa Nui (or its ISO code `rap`) appears in the codebase.
-- **Link to a translation service**: no code, config, or comment in this repo references a separate translation service or API contract with one.
+- **Link to a translation service**: no code, config, or comment in *this* repo references a separate translation service or API contract with one — the connection is established from the other side, via `translator-debug`'s README (see "Project context" above).
 - Two versions of the model service exist (`app.py`, GPU/webm-aware, actively built; `app_mms-1b-all.py`, CPU, unused by the Dockerfile) — kept here as-is rather than guessing which was the intended final version.

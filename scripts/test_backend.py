@@ -4,7 +4,7 @@ import requests
 backend_url = "https://asr-backend-service-463239650270.us-central1.run.app/api/transcribe/"
 
 # Ruta local del audio
-audio_path = "C:/Users/User Hugo/Desktop/CNIA/audio_prep_train_180.wav"
+audio_path = "path/to/your/audio.wav"
 
 # Enviar audio al backend
 with open(audio_path, "rb") as f:
