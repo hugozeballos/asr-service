@@ -3,6 +3,11 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 
+/**
+ * Redirects to /login if no access token is in localStorage.
+ * Returns true once the check has run and the token was found, so callers
+ * can render `null` until then instead of flashing protected content.
+ */
 export default function useAuthGuard(): boolean {
   const router = useRouter()
   const [isReady, setIsReady] = useState(false)
@@ -11,7 +16,6 @@ export default function useAuthGuard(): boolean {
     if (typeof window === 'undefined') return
 
     const token = localStorage.getItem('access')
-    console.log('🔒 useAuthGuard - token encontrado:', token)
 
     if (!token) {
       router.replace('/login')

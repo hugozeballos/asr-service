@@ -24,11 +24,11 @@ export default function LoginPage() {
       const data = await res.json()
       localStorage.setItem('access', data.access)
       localStorage.setItem('refresh', data.refresh)
-      console.log("TOKEN GUARDADO:", data.access) // 👈 esto
+      // Small delay so the localStorage write is committed before /grabar's
+      // useAuthGuard reads it on mount.
       setTimeout(() => {
         router.push('/grabar')
-        console.log("👀 TOKEN EN GRABAR:", localStorage.getItem("access"))
-      }, 200)  // Redirigir a la página principal o protegida
+      }, 200)
     } else {
       setError('Usuario o contraseña incorrectos.')
     }

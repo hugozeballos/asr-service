@@ -6,7 +6,9 @@ import Navbar from '@/components/Navbar'
 
 
 
-export default function GrabarPage() {  
+// Flow: upload or record audio -> transcribe -> confirm as-is (saves
+// immediately) or edit the text first, then save via onSaveCorrection.
+export default function GrabarPage() {
   const isReady = useAuthGuard()
   const [file, setFile] = useState<File | null>(null);
   const [audioURL, setAudioURL] = useState<string | null>(null);
@@ -44,10 +46,7 @@ export default function GrabarPage() {
           setFile(f);
           setAudioURL(URL.createObjectURL(blob));
           setIsRecording(false);
-          // ✅ Libera el micrófono
           stream.getTracks().forEach((track) => track.stop());
-          // 🧪 Consola para debug
-          console.log("🎧 Grabación completa:", f.name, f.type, f.size);
         };
 
         recorder.start();
@@ -221,7 +220,7 @@ export default function GrabarPage() {
                   <button
                     onClick={() => {
                       setIsConfirmed(true);
-                      onSaveCorrection(); // 👈 guarda de inmediato
+                      onSaveCorrection();
                     }}
                     className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
                   >

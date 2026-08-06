@@ -10,11 +10,10 @@ from .gcp_clients import upload_audio_to_gcs, save_metadata_to_firestore
 from google.cloud import firestore
 
 from rest_framework import viewsets, permissions
-from rest_framework.serializers import ModelSerializer
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
-# Serializador
+
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True)
 
@@ -36,38 +35,45 @@ class UserSerializer(serializers.ModelSerializer):
         )
         return user
 
-# Permiso personalizado (solo admin)
+
 class IsAdmin(permissions.BasePermission):
+    """Restricts a view to authenticated users with is_staff=True."""
+
     def has_permission(self, request, view):
         return request.user and request.user.is_staff
 
-# Vista
+
 class UserAdminViewSet(viewsets.ModelViewSet):
+    """Staff-only CRUD over Django users, used by the /admin_usuarios frontend page."""
+
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated, IsAdmin]
 
+
 class ListTranscriptionsView(APIView):
+    """Returns every saved transcription/correction pair from Firestore.
+
+    Not filtered by user_id yet: any authenticated user currently sees all
+    transcriptions, not just their own.
+    """
+
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
         db = firestore.Client()
-        collection_ref = db.collection("audios")
-        docs = collection_ref.stream()
-
-        user_id = str(request.user.id)
-        print("👤 Solicitando transcripciones para user_id:", user_id)
+        docs = db.collection("audios").stream()
 
         result = []
         for doc in docs:
             data = doc.to_dict()
-            print("📄 Documento Firestore:", data)  # 👈 agrega esto
             data["id"] = doc.id
             result.append(data)
-        print("📦 Total filtrado:", len(result))
         return Response(result)
 
 class AudioUploadView(APIView):
+    """Uploads an audio file to GCS and stores its transcription/correction in Firestore."""
+
     permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser]
 
@@ -79,8 +85,10 @@ class AudioUploadView(APIView):
         if not file or not transcription:
             return Response({'error': 'Missing audio file or transcription'}, status=400)
 
+        # Generate the storage filename instead of trusting the client-supplied
+        # one, to avoid collisions/overwrites and path-traversal-style names.
         import uuid, os
-        ext = os.path.splitext(file.name)[1] or ".webm"  # por si viene sin extensión
+        ext = os.path.splitext(file.name)[1] or ".webm"
         filename = f"audio_{uuid.uuid4().hex}{ext}"
         user_id = str(request.user.id)
 
@@ -102,35 +110,28 @@ class AudioUploadView(APIView):
 
 
 class TranscribeAPIView(APIView):
+    """Forwards an uploaded audio file to the ASR model microservice and relays its response."""
+
     permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser]
 
     def post(self, request, *args, **kwargs):
-        
         audio_file = request.FILES.get("file")
         if not audio_file:
             return Response({"error": "Se requiere un archivo 'audio'"}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            print("📡 Enviando solicitud al modelo:", settings.ASR_MODEL_URL)
-            print("📎 Nombre del archivo:", audio_file.name)
-            print("📏 Tamaño:", audio_file.size)
-            # Enviamos el archivo al microservicio del modelo
             response = requests.post(
                 settings.ASR_MODEL_URL,
                 files={"file": audio_file},
-                
-                timeout=900  # puedes ajustar este valor según necesidad
+                timeout=900,  # the model service can be slow on cold start / long audio
             )
             response.raise_for_status()
-            print(f"🟢 Status del modelo: {response.status_code}")
-            print(f"🟢 Texto de respuesta (parcial): {response.text[:300]}")
             try:
                 return Response(response.json())
             except ValueError:
                 return Response({"text": response.text})
 
         except requests.RequestException as e:
-            print("❌ Error al enviar solicitud al modelo:", e)
             return Response({"error": "Error al contactar al microservicio del modelo", "details": str(e)},
                             status=status.HTTP_502_BAD_GATEWAY)

@@ -17,16 +17,12 @@ interface TranscriptionData {
 
 export default function VerTranscripciones() {
   const [transcriptions, setTranscriptions] = useState<TranscriptionData[]>([])
-  const isReady = useAuthGuard() // ✅ usa el hook
-  console.log("🟢 isReady en VerTranscripciones:", isReady)
-
+  const isReady = useAuthGuard()
 
   useEffect(() => {
-    console.log("📥 useEffect ejecutado") // 👈 importante
     if (!isReady) return
 
     const token = localStorage.getItem("access")
-    console.log("🔑 token:", token)
     if (!token) return
 
     fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/list-transcriptions/`, {
@@ -38,16 +34,14 @@ export default function VerTranscripciones() {
         .then(async res => {
         const data = await res.json()
 
-        console.log("📦 Transcripciones recibidas:", data)
-
         if (!res.ok) {
-            console.error("❌ Error al traer transcripciones:", data)
+            console.error("Error al traer transcripciones:", data)
             return
         }
 
         setTranscriptions(data)
         })
-        .catch(err => console.error("🚨 Error en fetch de transcripciones:", err))
+        .catch(err => console.error("Error en fetch de transcripciones:", err))
     }, [isReady])
 
   return (
